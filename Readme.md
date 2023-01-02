@@ -78,6 +78,19 @@ Solution
         -index.html
 ```
 
+All the items in your `wwwroot` folder need to be set to `Content` and `Copy if Newer` or you can change your `.csproj` to do that 
+automatically:
+```xml
+<ItemGroup>
+    <None Remove="wwwroot\**" />
+</ItemGroup>
+<ItemGroup>
+    <Content Include="wwwroot\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+</ItemGroup>
+```
+
 Examine the `Templar.Example` project to see how this is implemented fully.
 
 ## Components
