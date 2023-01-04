@@ -126,6 +126,79 @@ namespace Templar.Tests
                 }
             }
         }
+        [Test]
+        public void TestSimilarComponentIdentity()
+        {
+            var components = new MockComponents();
+            components.Add<ButtonComponent>();
+            components.Add<ButtonCheckboxComponent>();
+            components.Add<ButtonCheckboxGroupComponent>();
+            var parameters = new ParametersContainer();
+            {
+                var componentBuilder = new ComponentBuilder(
+                    "{Component:Button} {Component:ButtonCheckbox} {Component:ButtonCheckboxGroup}",
+                    components, parameters);
+                bool grp = false;
+                bool chk = false;
+                bool btn = false;
+                foreach (var c in componentBuilder.GetComponents())
+                {
+                    var component = c.Component.Activate();
+                    if (component is ButtonCheckboxGroupComponent)
+                    {
+                        grp = true;
+                    }
+                    else if (component is ButtonCheckboxComponent)
+                    {
+                        chk = true;
+                    }
+                    else if (component is ButtonComponent)
+                    {
+                        btn = true;
+                    }
+                }
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(grp, Is.True);
+                    Assert.That(chk, Is.True);
+                    Assert.That(btn, Is.True);
+                });
+            }
+
+            {
+                var componentBuilder = new ComponentBuilder(
+                    "{Component:ButtonCheckboxGroup} {Component:ButtonCheckbox} {Component:Button}",
+                    components, parameters);
+                bool grp = false;
+                bool chk = false;
+                bool btn = false;
+                foreach (var c in componentBuilder.GetComponents())
+                {
+                    var component = c.Component.Activate();
+                    if (component is ButtonCheckboxGroupComponent)
+                    {
+                        grp = true;
+                    }
+                    else if (component is ButtonCheckboxComponent)
+                    {
+                        chk = true;
+                    }
+                    else if (component is ButtonComponent)
+                    {
+                        btn = true;
+                    }
+                }
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(grp, Is.True);
+                    Assert.That(chk, Is.True);
+                    Assert.That(btn, Is.True);
+                });
+            }
+            Assert.Pass();
+        }
         private class Test1Component : MockComponent
         {
             [Parameter]
@@ -141,8 +214,12 @@ namespace Templar.Tests
             public bool P3 { get; set; }
         }
         private class Test3Component : MockComponent
-        {
-
-        }
+        { }
+        private class ButtonComponent : MockComponent
+        { }
+        private class ButtonCheckboxComponent : MockComponent
+        { }
+        private class ButtonCheckboxGroupComponent : MockComponent
+        { }
     }
 }

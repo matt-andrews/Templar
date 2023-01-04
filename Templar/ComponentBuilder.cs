@@ -26,6 +26,8 @@ namespace Templar
                     if (!query.StartsWith(component.Key))
                         continue;
                     query = query[component.Key.Length..];
+                    if (!query.StartsWith(' ') && query != "")
+                        continue;
                     if (!string.IsNullOrWhiteSpace(query))
                         _parameters.AddQuery(query);
                     yield return new Result(component, "{Component:" + match.Value + "}");
