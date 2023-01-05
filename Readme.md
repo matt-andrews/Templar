@@ -164,7 +164,3 @@ Each individual component follows the following lifecycle
 * `GetFile(ISiteService)` which retrieves the document defined at `TemplatePath`
 * Maps any bindings in the document
 * Recursively builds each subsequent component
-
-## Publishing
-To publish on Azure the only requirement is a Configuration setting `AzureWebJobsScriptRoot` which should be set to the 
-Azure Functions content root. I use the value `../../../../../home/site/wwwroot` which should work in most situations.
