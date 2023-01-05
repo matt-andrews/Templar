@@ -104,8 +104,8 @@ builder.Services.AddTemplar(o =>
     o.AddComponent<ComponentName>();
 });
 ```
-Components are not activated as part of the DI container so they must have an empty constructor. To see how to inject services 
-into your components, see the *Service Injection* section below.
+Components are not activated as part of the integrated DI container so they must have an empty constructor. 
+To see how to inject services into your components, see the *Service Injection* section below.
 
 You can skip linking a document to render(ideal for small components) by overriding the method `GetFile(IStaticSiteService)` and 
 returning the html of the component like so:
@@ -126,7 +126,7 @@ Components don't have to be html documents, for instance you could make a css co
 ## Property Binding
 Property binding is automatic. All properties in your component class are matched to their equivalent in the document prefixed with a `@` 
 So the property `public string Data { get; set; }` would be matched in a document to `@Data`. Any property(public or non-public) can 
-be bound, but not fields or methods.
+be bound, but not fields or methods(with the exception of the parameterless `.ToString()`).
 
 ## Parameters
 Parameters can be defined with the `[Parameter]` attribute. Parameters on the `{Component:AppBody}`(The current Page component) 
@@ -140,6 +140,19 @@ To pass parameters to components, structure your component with the parameters i
 ```
 Parameters are separated by spaces, parameter names must be lowercase and they must have their values surrounded by quotes, 
 even if you're using a binding.
+
+Parameters can be both value types and reference types. To pass a reference, use a binding as the parameter value:
+```
+public MyObject Ref { get; set; }
+...
+{Component:Test p1="@Ref"}
+...
+public class TestComponent : TemplarComponent
+{
+    [Parameter]
+    public MyObject P1 { get; set; }
+}
+```
 
 ## Service Injection
 You can inject services into your components with the `[Inject]` tag.
@@ -164,3 +177,17 @@ Each individual component follows the following lifecycle
 * `GetFile(ISiteService)` which retrieves the document defined at `TemplatePath`
 * Maps any bindings in the document
 * Recursively builds each subsequent component
+
+## Static Content
+Static content such as js/css etc. can be called from `ITemplarService` with the `Invoke(HttpRequest,string,string)` overload. 
+To ensure that your content sub folders are obtained properly, you should add a prefix to your route like so:
+```
+[FunctionName("StaticContent")]
+public async Task<IActionResult> StaticContent(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "content/{folder}/{file}")] HttpRequest req,
+    string file, string folder)
+{
+    return await _templarService.Invoke(req, folder, file);
+}
+```
+The above request will return a file listed at the directory `folder/file` and will pass through all middleware.
