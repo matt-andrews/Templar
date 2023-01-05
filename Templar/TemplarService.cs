@@ -14,14 +14,23 @@ namespace Templar
 
         public async Task<IActionResult> Invoke(HttpRequest req, TemplarComponent page)
         {
-            var file = await _middleware.Invoke(req, page);
-            if (file is not null)
-                return new FileStreamResult(file, "text/html");
+            var result = await _middleware.Invoke(req, page);
+            if (result is not null)
+                return new FileStreamResult(result, page.MimeType);
+            return new BadRequestResult();
+        }
+        public async Task<IActionResult> Invoke(HttpRequest req, string folder = "", string file = "")
+        {
+            var page = new StaticContentComponent($"{folder}/{file}");
+            var result = await _middleware.Invoke(req, page);
+            if (result is not null)
+                return new FileStreamResult(result, page.MimeType);
             return new BadRequestResult();
         }
     }
     public interface ITemplarService
     {
         Task<IActionResult> Invoke(HttpRequest req, TemplarComponent page);
+        Task<IActionResult> Invoke(HttpRequest req, string folder = "", string file = "");
     }
 }

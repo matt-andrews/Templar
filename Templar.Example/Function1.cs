@@ -14,11 +14,9 @@ namespace Templar.Example
     public class Function1
     {
         private readonly ITemplarService _templarService;
-        private readonly IStaticSiteService _siteService;
-        public Function1(ITemplarService templarService, IStaticSiteService siteService)
+        public Function1(ITemplarService templarService)
         {
             _templarService = templarService;
-            _siteService = siteService;
         }
 
         [FunctionName("StaticRoot")]
@@ -33,7 +31,7 @@ namespace Templar.Example
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "content/{folder}/{file}")] HttpRequest req,
             string file, string folder)
         {
-            return await _siteService.Run(file ?? "", folder);
+            return await _templarService.Invoke(req, folder, file);
         }
     }
 }

@@ -19,9 +19,17 @@ namespace Templar.Middleware
         }
         public async Task Invoke(HttpRequest req, TemplarComponent page, IMiddlewareBuilder next)
         {
-            var appBody = new AppBodyComponent(_options.ContentRoot);
-            var parameters = BuildParameters(req);
-            var file = await appBody.Initialize(page, _options.Components, _siteService, _serviceProvider, parameters, req);
+            string file;
+            if (page is StaticContentComponent staticContent)
+            {
+                file = staticContent.GetStaticFile(_siteService);
+            }
+            else
+            {
+                var appBody = new AppBodyComponent(_options.ContentRoot);
+                var parameters = BuildParameters(req);
+                file = await appBody.Initialize(page, _options.Components, _siteService, _serviceProvider, parameters, req);
+            }
             byte[] byteArray = Encoding.UTF8.GetBytes(file);
             Result = new MemoryStream(byteArray);
         }

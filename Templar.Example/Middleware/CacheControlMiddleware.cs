@@ -12,6 +12,10 @@ namespace Templar.Example.Middleware
             {
                 req.HttpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store");
             }
+            else
+            {
+                req.HttpContext.Response.Headers.Add("Cache-Control", "public, max-age=15552000");
+            }
             await next.Next(req, page);
         }
     }

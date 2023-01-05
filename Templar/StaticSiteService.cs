@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MimeTypes;
-
-namespace Templar
+﻿namespace Templar
 {
     internal class StaticSiteService : IStaticSiteService
     {
@@ -9,33 +6,6 @@ namespace Templar
         public StaticSiteService(StaticSiteConfiguration staticSiteConfiguration)
         {
             _staticSiteConfiguration = staticSiteConfiguration;
-        }
-        public Task<IActionResult> Run(string? file, string route = "")
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(route))
-                {
-                    file = $"{route}/{file}";
-                }
-                var filePath = GetFilePath(file ?? "");
-                if (File.Exists(filePath))
-                {
-                    var stream = File.OpenRead(filePath);
-                    return Task.FromResult<IActionResult>(new FileStreamResult(stream, GetMimeType(filePath))
-                    {
-                        LastModified = File.GetLastWriteTime(filePath)
-                    });
-                }
-                else
-                {
-                    return Task.FromResult<IActionResult>(new NotFoundResult());
-                }
-            }
-            catch
-            {
-                return Task.FromResult<IActionResult>(new BadRequestResult());
-            }
         }
         public string GetFile(string? file, string route = "")
         {
@@ -64,16 +34,9 @@ namespace Templar
         }
 
         private static bool IsInDirectory(string parentPath, string childPath) => childPath.StartsWith(parentPath);
-
-        private static string GetMimeType(string filePath)
-        {
-            var fileInfo = new FileInfo(filePath);
-            return MimeTypeMap.GetMimeType(fileInfo.Extension);
-        }
     }
     public interface IStaticSiteService
     {
-        Task<IActionResult> Run(string? file, string route = "");
         string GetFile(string? file, string route = "");
     }
 }

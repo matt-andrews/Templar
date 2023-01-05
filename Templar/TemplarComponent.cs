@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using MimeTypes;
 using Templar.Attributes;
 using Templar.Containers;
 
@@ -8,7 +9,17 @@ namespace Templar
     {
         public abstract string TemplatePath { get; }
         protected HttpRequest Request { get; private set; } = default!;
-
+        private string? _mimeType;
+        public string MimeType
+        {
+            get
+            {
+                if (_mimeType is not null)
+                    return _mimeType;
+                var fileInfo = new FileInfo(TemplatePath);
+                return _mimeType = MimeTypeMap.GetMimeType(fileInfo.Extension);
+            }
+        }
         protected virtual Task OnInitializedAsync()
         {
             return Task.CompletedTask;
